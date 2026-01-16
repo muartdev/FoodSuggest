@@ -8,7 +8,7 @@ struct HomeView: View {
     @State private var searchText: String = ""
 
     private let categories: [String] = ["All", "Breakfast", "Lunch", "Dinner", "Snack", "Dessert"]
-    private let sectionSpacing: CGFloat = 14
+    private let sectionSpacing: CGFloat = 10
 
     var body: some View {
         NavigationStack {
@@ -21,7 +21,7 @@ struct HomeView: View {
                         if filteredMeals.isEmpty {
                             emptyState
                         } else {
-                            LazyVStack(spacing: 14) {
+                            LazyVStack(spacing: 10) {
                                 ForEach(filteredMeals) { meal in
                                     NavigationLink {
                                         MealDetailView(meal: meal)
@@ -42,7 +42,7 @@ struct HomeView: View {
                     .animation(.easeInOut(duration: 0.15), value: searchText)
                 }
                 .padding(.horizontal, 16)
-                .padding(.top, 6)
+                .padding(.top, 2)
                 .padding(.bottom, 24)
             }
             .background(AppBackgroundView())

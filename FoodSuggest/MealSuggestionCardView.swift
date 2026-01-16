@@ -114,7 +114,7 @@ struct MealCompactCardView: View {
     @State private var didQuickAddPulse = false
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 10) {
             thumbnail
 
             VStack(alignment: .leading, spacing: 6) {
@@ -171,14 +171,14 @@ struct MealCompactCardView: View {
             .buttonStyle(.borderless)
         }
         .padding(.horizontal, 12)
-        .padding(.vertical, 10)
+        .padding(.vertical, 8)
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .stroke(.white.opacity(0.10), lineWidth: 1)
         )
-        .shadow(color: .black.opacity(0.05), radius: 12, x: 0, y: 6)
+        .shadow(color: .black.opacity(0.045), radius: 10, x: 0, y: 5)
     }
 
     private var thumbnail: some View {
@@ -189,7 +189,7 @@ struct MealCompactCardView: View {
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundStyle(accent)
         }
-        .frame(width: 44, height: 44)
+        .frame(width: 40, height: 40)
     }
 
     private var accent: Color {
