@@ -19,7 +19,7 @@ struct FavoritesView: View {
                             } label: {
                                 MealSuggestionCardView(
                                     meal: meal,
-                                    isSaved: true,
+                                    isSaved: favorites.isSaved(meal.id),
                                     onToggleSave: { favorites.toggle(meal.id) }
                                 )
                             }
