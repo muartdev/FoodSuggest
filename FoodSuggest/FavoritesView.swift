@@ -48,8 +48,8 @@ struct FavoritesView: View {
                 }
             }
             .background(AppBackgroundView())
-            .navigationTitle("Favorites")
-            .navigationBarTitleDisplayMode(.large)
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 }

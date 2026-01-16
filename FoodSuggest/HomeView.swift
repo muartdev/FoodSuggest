@@ -8,11 +8,12 @@ struct HomeView: View {
     @State private var searchText: String = ""
 
     private let categories: [String] = ["All", "Breakfast", "Lunch", "Dinner", "Snack", "Dessert"]
+    private let sectionSpacing: CGFloat = 14
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: sectionSpacing) {
                     categoryFilter
                     todaysPickSection
                     todaysMacrosSection
@@ -42,14 +43,14 @@ struct HomeView: View {
                     .animation(.easeInOut(duration: 0.15), value: searchText)
                 }
                 .padding(.horizontal, 16)
-                .padding(.top, 12)
+                .padding(.top, 6)
                 .padding(.bottom, 24)
             }
             .background(AppBackgroundView())
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
         }
-        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search meals")
+        .searchable(text: $searchText, placement: .toolbar, prompt: "Search meals")
         .scrollDismissesKeyboard(.interactively)
         .onAppear {
             if todaysPickID == nil {
@@ -116,11 +117,16 @@ struct HomeView: View {
     }
 
     private var todaysMacrosSection: some View {
-        TodaysMacrosCard(
-            carbs: (consumed: intake.carbsConsumed, target: intake.targets.carbs, color: Color.blue.opacity(0.75)),
-            protein: (consumed: intake.proteinConsumed, target: intake.targets.protein, color: Color.mint.opacity(0.85)),
-            fat: (consumed: intake.fatConsumed, target: intake.targets.fat, color: Color.orange.opacity(0.80))
-        )
+        Button {
+            // Future: open a detailed macros view
+        } label: {
+            TodaysMacrosMiniCard(
+                carbs: (consumed: intake.carbsConsumed, target: intake.targets.carbs, color: Color.blue.opacity(0.55)),
+                protein: (consumed: intake.proteinConsumed, target: intake.targets.protein, color: Color.mint.opacity(0.60)),
+                fat: (consumed: intake.fatConsumed, target: intake.targets.fat, color: Color.orange.opacity(0.55))
+            )
+        }
+        .buttonStyle(.plain)
     }
 
     private var categoryFilter: some View {
@@ -167,10 +173,10 @@ private struct TodaysPickCard: View {
                     .fill(accent.opacity(0.18))
 
                 Image(systemName: meal.imageName)
-                    .font(.system(size: 34, weight: .semibold))
+                    .font(.system(size: 36, weight: .semibold))
                     .foregroundStyle(accent)
             }
-            .frame(width: 84, height: 84)
+            .frame(width: 92, height: 92)
 
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 8) {
@@ -201,14 +207,14 @@ private struct TodaysPickCard: View {
                 .font(.footnote.weight(.semibold))
                 .foregroundStyle(.tertiary)
         }
-        .padding(16)
+        .padding(18)
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 22, style: .continuous)
                 .stroke(.white.opacity(0.14), lineWidth: 1)
         )
-        .shadow(color: .black.opacity(0.08), radius: 20, x: 0, y: 12)
+        .shadow(color: .black.opacity(0.10), radius: 22, x: 0, y: 14)
     }
 
     private var accent: Color {
@@ -223,36 +229,30 @@ private struct TodaysPickCard: View {
     }
 }
 
-private struct TodaysMacrosCard: View {
+private struct TodaysMacrosMiniCard: View {
     let carbs: (consumed: Int, target: Int, color: Color)
     let protein: (consumed: Int, target: Int, color: Color)
     let fat: (consumed: Int, target: Int, color: Color)
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("Today’s Macros")
-                    .font(.headline)
-                Spacer(minLength: 0)
-            }
-
-            MacroRow(label: "Carbs", consumed: carbs.consumed, target: carbs.target, color: carbs.color)
-            MacroRow(label: "Protein", consumed: protein.consumed, target: protein.target, color: protein.color)
-            MacroRow(label: "Fat", consumed: fat.consumed, target: fat.target, color: fat.color)
+        VStack(alignment: .leading, spacing: 8) {
+            MiniMacroBar(consumed: carbs.consumed, target: carbs.target, color: carbs.color)
+            MiniMacroBar(consumed: protein.consumed, target: protein.target, color: protein.color)
+            MiniMacroBar(consumed: fat.consumed, target: fat.target, color: fat.color)
         }
-        .padding(16)
+        .padding(.vertical, 10)
+        .padding(.horizontal, 12)
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(.white.opacity(0.14), lineWidth: 1)
+                .stroke(.white.opacity(0.12), lineWidth: 1)
         )
-        .shadow(color: .black.opacity(0.07), radius: 18, x: 0, y: 12)
+        .shadow(color: .black.opacity(0.03), radius: 10, x: 0, y: 6)
     }
 }
 
-private struct MacroRow: View {
-    let label: String
+private struct MiniMacroBar: View {
     let consumed: Int
     let target: Int
     let color: Color
@@ -263,24 +263,11 @@ private struct MacroRow: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(alignment: .firstTextBaseline) {
-                Text(label)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.primary)
-
-                Spacer(minLength: 0)
-
-                Text("\(consumed) / \(target)g")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-
-            ProgressView(value: progress)
-                .tint(color)
-                .background(Color.primary.opacity(0.08))
-                .clipShape(Capsule())
-        }
+        ProgressView(value: progress)
+            .tint(color)
+            .background(Color.primary.opacity(0.05))
+            .clipShape(Capsule())
+            .frame(height: 5)
     }
 }
 

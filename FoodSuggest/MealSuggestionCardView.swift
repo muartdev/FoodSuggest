@@ -75,9 +75,9 @@ struct MealSuggestionCardView: View {
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(.white.opacity(0.14), lineWidth: 1)
+                .stroke(.white.opacity(0.12), lineWidth: 1)
         )
-        .shadow(color: .black.opacity(0.08), radius: 18, x: 0, y: 12)
+        .shadow(color: .black.opacity(0.06), radius: 14, x: 0, y: 8)
     }
 
     private var icon: some View {
