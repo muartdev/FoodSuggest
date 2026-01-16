@@ -4,6 +4,9 @@ struct MealSuggestionCardView: View {
     let meal: Meal
     let isSaved: Bool
     let onToggleSave: () -> Void
+    let onQuickAdd: () -> Void
+
+    @State private var didQuickAddPulse = false
 
     var body: some View {
         HStack(spacing: 14) {
@@ -31,6 +34,27 @@ struct MealSuggestionCardView: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
+
+            Button {
+                onQuickAdd()
+                withAnimation(.spring(response: 0.25, dampingFraction: 0.70)) {
+                    didQuickAddPulse = true
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) {
+                    withAnimation(.easeOut(duration: 0.15)) {
+                        didQuickAddPulse = false
+                    }
+                }
+            } label: {
+                Image(systemName: "plus")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(.secondary)
+                    .frame(width: 32, height: 32)
+                    .background(.thinMaterial)
+                    .clipShape(Circle())
+            }
+            .buttonStyle(.borderless)
+            .scaleEffect(didQuickAddPulse ? 1.10 : 1.0)
 
             Button(action: onToggleSave) {
                 Image(systemName: isSaved ? "heart.fill" : "heart")

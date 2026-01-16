@@ -10,11 +10,13 @@ import SwiftUI
 @main
 struct FoodSuggestApp: App {
     @StateObject private var favoritesStore = FavoritesStore()
+    @StateObject private var intakeStore = TodayIntakeStore()
 
     var body: some Scene {
         WindowGroup {
             MainTabView()
                 .environmentObject(favoritesStore)
+                .environmentObject(intakeStore)
         }
     }
 }

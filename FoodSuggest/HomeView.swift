@@ -2,6 +2,7 @@ import SwiftUI
 
 struct HomeView: View {
     @EnvironmentObject private var favorites: FavoritesStore
+    @EnvironmentObject private var intake: TodayIntakeStore
     @State private var selectedCategory: String = "All"
     @State private var todaysPickID: Meal.ID?
     @State private var searchText: String = ""
@@ -12,22 +13,29 @@ struct HomeView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    header
                     categoryFilter
                     todaysPickSection
+                    todaysMacrosSection
 
-                    LazyVStack(spacing: 14) {
-                        ForEach(filteredMeals) { meal in
-                            NavigationLink {
-                                MealDetailView(meal: meal)
-                            } label: {
-                                MealSuggestionCardView(
-                                    meal: meal,
-                                    isSaved: favorites.isSaved(meal.id),
-                                    onToggleSave: { favorites.toggle(meal.id) }
-                                )
+                    Group {
+                        if filteredMeals.isEmpty {
+                            emptyState
+                        } else {
+                            LazyVStack(spacing: 14) {
+                                ForEach(filteredMeals) { meal in
+                                    NavigationLink {
+                                        MealDetailView(meal: meal)
+                                    } label: {
+                                        MealSuggestionCardView(
+                                            meal: meal,
+                                            isSaved: favorites.isSaved(meal.id),
+                                            onToggleSave: { favorites.toggle(meal.id) },
+                                            onQuickAdd: { intake.add(meal: meal) }
+                                        )
+                                    }
+                                    .buttonStyle(.plain)
+                                }
                             }
-                            .buttonStyle(.plain)
                         }
                     }
                     .animation(.easeInOut(duration: 0.20), value: selectedCategory)
@@ -38,8 +46,8 @@ struct HomeView: View {
                 .padding(.bottom, 24)
             }
             .background(AppBackgroundView())
-            .navigationTitle("Home")
-            .navigationBarTitleDisplayMode(.large)
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
         }
         .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search meals")
         .scrollDismissesKeyboard(.interactively)
@@ -64,6 +72,31 @@ struct HomeView: View {
         return base.filter { $0.name.localizedCaseInsensitiveContains(query) }
     }
 
+    private var emptyState: some View {
+        ContentUnavailableView(
+            "No meals found",
+            systemImage: "sparkles.magnifyingglass",
+            description: Text(emptyStateMessage)
+        )
+        .padding(.vertical, 18)
+        .frame(maxWidth: .infinity)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(.white.opacity(0.14), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.08), radius: 18, x: 0, y: 12)
+    }
+
+    private var emptyStateMessage: String {
+        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !query.isEmpty {
+            return "Try a different name or clear the search to explore more meals."
+        }
+        return "Try another category—your next favorite could be one tap away."
+    }
+
     private var todaysPickMeal: Meal? {
         guard let id = todaysPickID else { return nil }
         return MockMeals.all.first(where: { $0.id == id })
@@ -80,6 +113,14 @@ struct HomeView: View {
                 .buttonStyle(.plain)
             }
         }
+    }
+
+    private var todaysMacrosSection: some View {
+        TodaysMacrosCard(
+            carbs: (consumed: intake.carbsConsumed, target: intake.targets.carbs, color: Color.blue.opacity(0.75)),
+            protein: (consumed: intake.proteinConsumed, target: intake.targets.protein, color: Color.mint.opacity(0.85)),
+            fat: (consumed: intake.fatConsumed, target: intake.targets.fat, color: Color.orange.opacity(0.80))
+        )
     }
 
     private var categoryFilter: some View {
@@ -114,24 +155,6 @@ struct HomeView: View {
         }
     }
 
-    private var header: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Meal suggestions")
-                .font(.title2)
-                .fontWeight(.semibold)
-
-            Text("Pick something good in seconds.")
-                .foregroundStyle(.secondary)
-        }
-        .padding(16)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(.white.opacity(0.18), lineWidth: 1)
-        )
-        .shadow(color: .black.opacity(0.09), radius: 20, x: 0, y: 12)
-    }
 }
 
 private struct TodaysPickCard: View {
@@ -200,8 +223,70 @@ private struct TodaysPickCard: View {
     }
 }
 
+private struct TodaysMacrosCard: View {
+    let carbs: (consumed: Int, target: Int, color: Color)
+    let protein: (consumed: Int, target: Int, color: Color)
+    let fat: (consumed: Int, target: Int, color: Color)
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Today’s Macros")
+                    .font(.headline)
+                Spacer(minLength: 0)
+            }
+
+            MacroRow(label: "Carbs", consumed: carbs.consumed, target: carbs.target, color: carbs.color)
+            MacroRow(label: "Protein", consumed: protein.consumed, target: protein.target, color: protein.color)
+            MacroRow(label: "Fat", consumed: fat.consumed, target: fat.target, color: fat.color)
+        }
+        .padding(16)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(.white.opacity(0.14), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.07), radius: 18, x: 0, y: 12)
+    }
+}
+
+private struct MacroRow: View {
+    let label: String
+    let consumed: Int
+    let target: Int
+    let color: Color
+
+    private var progress: Double {
+        guard target > 0 else { return 0 }
+        return min(Double(consumed) / Double(target), 1)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .firstTextBaseline) {
+                Text(label)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.primary)
+
+                Spacer(minLength: 0)
+
+                Text("\(consumed) / \(target)g")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
+            ProgressView(value: progress)
+                .tint(color)
+                .background(Color.primary.opacity(0.08))
+                .clipShape(Capsule())
+        }
+    }
+}
+
 #Preview {
     MainTabView()
         .environmentObject(FavoritesStore())
+        .environmentObject(TodayIntakeStore())
 }
 

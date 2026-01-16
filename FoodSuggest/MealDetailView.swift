@@ -200,6 +200,7 @@ private struct InfoPill: View {
     NavigationStack {
         MealDetailView(meal: MockMeals.all[0])
             .environmentObject(FavoritesStore())
+            .environmentObject(TodayIntakeStore())
     }
 }
 
