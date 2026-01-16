@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct MealSuggestionCardView: View {
-    let meal: MealSuggestion
+    let meal: Meal
     let isSaved: Bool
     let onToggleSave: () -> Void
 
@@ -11,13 +11,13 @@ struct MealSuggestionCardView: View {
 
             VStack(alignment: .leading, spacing: 6) {
                 HStack(alignment: .firstTextBaseline) {
-                    Text(meal.title)
+                    Text(meal.name)
                         .font(.headline)
                         .foregroundStyle(.primary)
 
                     Spacer(minLength: 0)
 
-                    Text(meal.tag.uppercased())
+                    Text(meal.category.uppercased())
                         .font(.caption2)
                         .fontWeight(.semibold)
                         .foregroundStyle(.secondary)
@@ -27,7 +27,7 @@ struct MealSuggestionCardView: View {
                         .clipShape(Capsule())
                 }
 
-                Text(meal.subtitle)
+                Text(meal.description)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -59,12 +59,25 @@ struct MealSuggestionCardView: View {
     private var icon: some View {
         ZStack {
             Circle()
-                .fill(meal.accent.opacity(0.20))
-            Image(systemName: meal.symbol)
+                .fill(accent.opacity(0.20))
+            Image(systemName: meal.imageName)
                 .font(.system(size: 18, weight: .semibold))
-                .foregroundStyle(meal.accent)
+                .foregroundStyle(accent)
         }
         .frame(width: 44, height: 44)
+    }
+
+    private var accent: Color {
+        switch meal.category.lowercased() {
+        case "high protein": return .mint
+        case "comfort": return .red
+        case "healthy": return .green
+        case "quick meal": return .blue
+        case "breakfast": return .orange
+        case "vegetarian": return .purple
+        case "asian": return .indigo
+        default: return .secondary
+        }
     }
 }
 

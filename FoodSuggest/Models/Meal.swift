@@ -1,17 +1,14 @@
-//
-//  Meal.swift
-//  FoodSuggest
-//
-//  Created by Murat on 16.01.2026.
-//
-
 import Foundation
 
-struct Meal: Codable, Identifiable, Equatable {
-    let id: UUID
+struct Meal: Identifiable, Equatable {
+    let id: String
     let name: String
+    let imageName: String
+    let calories: Int
+    let protein: Int
+    let carbs: Int
+    let fat: Int
+    let description: String
     let category: String
-    let ingredients: [String]
-    let instructions: String
 }
 

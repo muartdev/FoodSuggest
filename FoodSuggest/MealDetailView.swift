@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct MealDetailView: View {
-    let meal: MealSuggestion
+    let meal: Meal
 
     @EnvironmentObject private var favorites: FavoritesStore
 
@@ -23,7 +23,7 @@ struct MealDetailView: View {
             .padding(.bottom, 28)
         }
         .background(AppBackgroundView())
-        .navigationTitle(meal.title)
+        .navigationTitle(meal.name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -51,17 +51,17 @@ struct MealDetailView: View {
             ZStack {
                 LinearGradient(
                     colors: [
-                        meal.accent.opacity(0.25),
-                        meal.accent.opacity(0.08),
+                        accent.opacity(0.25),
+                        accent.opacity(0.08),
                         Color.clear
                     ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
 
-                Image(systemName: meal.heroSymbol)
+                Image(systemName: meal.imageName)
                     .font(.system(size: 54, weight: .semibold))
-                    .foregroundStyle(meal.accent)
+                    .foregroundStyle(accent)
                     .shadow(color: .black.opacity(0.10), radius: 18, x: 0, y: 10)
             }
             .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
@@ -72,11 +72,11 @@ struct MealDetailView: View {
 
     private var titleBlock: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(meal.title)
+            Text(meal.name)
                 .font(.title2)
                 .fontWeight(.semibold)
 
-            Text(meal.subtitle)
+            Text(meal.description)
                 .foregroundStyle(.secondary)
         }
         .padding(16)
@@ -92,29 +92,19 @@ struct MealDetailView: View {
     private var infoRow: some View {
         HStack(spacing: 12) {
             InfoPill(title: "Calories", value: "\(meal.calories)", symbol: "flame")
-            InfoPill(title: "Time", value: "\(meal.prepMinutes)m", symbol: "clock")
+            InfoPill(title: "Protein", value: "\(meal.protein)g", symbol: "circle.grid.cross")
             InfoPill(title: "Type", value: meal.category, symbol: "tag")
         }
     }
 
     private var ingredientsCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Ingredients")
+            Text("Macros")
                 .font(.headline)
 
             VStack(alignment: .leading, spacing: 10) {
-                ForEach(meal.ingredients, id: \.self) { item in
-                    HStack(alignment: .firstTextBaseline, spacing: 10) {
-                        Circle()
-                            .fill(.secondary.opacity(0.35))
-                            .frame(width: 6, height: 6)
-
-                        Text(item)
-                            .foregroundStyle(.primary)
-
-                        Spacer(minLength: 0)
-                    }
-                }
+                macroRow(label: "Carbs", value: "\(meal.carbs)g")
+                macroRow(label: "Fat", value: "\(meal.fat)g")
             }
         }
         .padding(16)
@@ -129,25 +119,12 @@ struct MealDetailView: View {
 
     private var instructionsCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Instructions")
+            Text("About")
                 .font(.headline)
 
-            VStack(alignment: .leading, spacing: 12) {
-                ForEach(Array(meal.steps.enumerated()), id: \.offset) { index, step in
-                    HStack(alignment: .top, spacing: 10) {
-                        Text("\(index + 1).")
-                            .fontWeight(.semibold)
-                            .foregroundStyle(.secondary)
-                            .frame(width: 22, alignment: .leading)
-
-                        Text(step)
-                            .foregroundStyle(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-
-                        Spacer(minLength: 0)
-                    }
-                }
-            }
+            Text(meal.description)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .padding(16)
         .background(.ultraThinMaterial)
@@ -157,6 +134,31 @@ struct MealDetailView: View {
                 .stroke(.white.opacity(0.14), lineWidth: 1)
         )
         .shadow(color: .black.opacity(0.06), radius: 16, x: 0, y: 10)
+    }
+
+    private func macroRow(label: String, value: String) -> some View {
+        HStack {
+            Text(label)
+                .foregroundStyle(.secondary)
+            Spacer(minLength: 0)
+            Text(value)
+                .fontWeight(.semibold)
+                .foregroundStyle(.primary)
+        }
+        .font(.subheadline)
+    }
+
+    private var accent: Color {
+        switch meal.category.lowercased() {
+        case "high protein": return .mint
+        case "comfort": return .red
+        case "healthy": return .green
+        case "quick meal": return .blue
+        case "breakfast": return .orange
+        case "vegetarian": return .purple
+        case "asian": return .indigo
+        default: return .secondary
+        }
     }
 }
 
