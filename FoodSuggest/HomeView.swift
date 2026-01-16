@@ -16,7 +16,6 @@ struct HomeView: View {
                 VStack(alignment: .leading, spacing: sectionSpacing) {
                     categoryFilter
                     todaysPickSection
-                    todaysMacrosSection
 
                     Group {
                         if filteredMeals.isEmpty {
@@ -27,7 +26,7 @@ struct HomeView: View {
                                     NavigationLink {
                                         MealDetailView(meal: meal)
                                     } label: {
-                                        MealSuggestionCardView(
+                                        MealCompactCardView(
                                             meal: meal,
                                             isSaved: favorites.isSaved(meal.id),
                                             onToggleSave: { favorites.toggle(meal.id) },
@@ -114,19 +113,6 @@ struct HomeView: View {
                 .buttonStyle(.plain)
             }
         }
-    }
-
-    private var todaysMacrosSection: some View {
-        Button {
-            // Future: open a detailed macros view
-        } label: {
-            TodaysMacrosMiniCard(
-                carbs: (consumed: intake.carbsConsumed, target: intake.targets.carbs, color: Color.blue.opacity(0.55)),
-                protein: (consumed: intake.proteinConsumed, target: intake.targets.protein, color: Color.mint.opacity(0.60)),
-                fat: (consumed: intake.fatConsumed, target: intake.targets.fat, color: Color.orange.opacity(0.55))
-            )
-        }
-        .buttonStyle(.plain)
     }
 
     private var categoryFilter: some View {
@@ -226,48 +212,6 @@ private struct TodaysPickCard: View {
         case "dessert": return .pink
         default: return .secondary
         }
-    }
-}
-
-private struct TodaysMacrosMiniCard: View {
-    let carbs: (consumed: Int, target: Int, color: Color)
-    let protein: (consumed: Int, target: Int, color: Color)
-    let fat: (consumed: Int, target: Int, color: Color)
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            MiniMacroBar(consumed: carbs.consumed, target: carbs.target, color: carbs.color)
-            MiniMacroBar(consumed: protein.consumed, target: protein.target, color: protein.color)
-            MiniMacroBar(consumed: fat.consumed, target: fat.target, color: fat.color)
-        }
-        .padding(.vertical, 10)
-        .padding(.horizontal, 12)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(.white.opacity(0.12), lineWidth: 1)
-        )
-        .shadow(color: .black.opacity(0.03), radius: 10, x: 0, y: 6)
-    }
-}
-
-private struct MiniMacroBar: View {
-    let consumed: Int
-    let target: Int
-    let color: Color
-
-    private var progress: Double {
-        guard target > 0 else { return 0 }
-        return min(Double(consumed) / Double(target), 1)
-    }
-
-    var body: some View {
-        ProgressView(value: progress)
-            .tint(color)
-            .background(Color.primary.opacity(0.05))
-            .clipShape(Capsule())
-            .frame(height: 5)
     }
 }
 

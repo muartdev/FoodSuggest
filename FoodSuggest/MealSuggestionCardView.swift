@@ -105,6 +105,105 @@ struct MealSuggestionCardView: View {
     }
 }
 
+struct MealCompactCardView: View {
+    let meal: Meal
+    let isSaved: Bool
+    let onToggleSave: () -> Void
+    let onQuickAdd: () -> Void
+
+    @State private var didQuickAddPulse = false
+
+    var body: some View {
+        HStack(spacing: 12) {
+            thumbnail
+
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(alignment: .firstTextBaseline, spacing: 10) {
+                    Text(meal.name)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+
+                    Spacer(minLength: 0)
+
+                    Text("\(meal.calories) kcal")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+
+                Text(meal.description)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
+
+            Spacer(minLength: 0)
+
+            Button {
+                onQuickAdd()
+                withAnimation(.spring(response: 0.25, dampingFraction: 0.70)) {
+                    didQuickAddPulse = true
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) {
+                    withAnimation(.easeOut(duration: 0.15)) {
+                        didQuickAddPulse = false
+                    }
+                }
+            } label: {
+                Image(systemName: "plus")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.secondary)
+                    .frame(width: 28, height: 28)
+                    .background(.thinMaterial)
+                    .clipShape(Circle())
+            }
+            .buttonStyle(.borderless)
+            .scaleEffect(didQuickAddPulse ? 1.10 : 1.0)
+
+            Button(action: onToggleSave) {
+                Image(systemName: isSaved ? "heart.fill" : "heart")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(isSaved ? Color.pink : .secondary)
+                    .frame(width: 30, height: 30)
+                    .background(.thinMaterial)
+                    .clipShape(Circle())
+            }
+            .buttonStyle(.borderless)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(.white.opacity(0.10), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.05), radius: 12, x: 0, y: 6)
+    }
+
+    private var thumbnail: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(accent.opacity(0.18))
+            Image(systemName: meal.imageName)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(accent)
+        }
+        .frame(width: 44, height: 44)
+    }
+
+    private var accent: Color {
+        switch meal.category.lowercased() {
+        case "breakfast": return .orange
+        case "lunch": return .mint
+        case "dinner": return .red
+        case "snack": return .purple
+        case "dessert": return .pink
+        default: return .secondary
+        }
+    }
+}
+
 struct AppBackgroundView: View {
     var body: some View {
         ZStack {
