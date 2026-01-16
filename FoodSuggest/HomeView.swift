@@ -2,15 +2,22 @@ import SwiftUI
 
 struct HomeView: View {
     @EnvironmentObject private var favorites: FavoritesStore
+    @State private var selectedCategory: String = "All"
+    @State private var todaysPickID: Meal.ID?
+    @State private var searchText: String = ""
+
+    private let categories: [String] = ["All", "Breakfast", "Lunch", "Dinner", "Snack", "Dessert"]
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     header
+                    categoryFilter
+                    todaysPickSection
 
                     LazyVStack(spacing: 14) {
-                        ForEach(MockMeals.all) { meal in
+                        ForEach(filteredMeals) { meal in
                             NavigationLink {
                                 MealDetailView(meal: meal)
                             } label: {
@@ -23,6 +30,8 @@ struct HomeView: View {
                             .buttonStyle(.plain)
                         }
                     }
+                    .animation(.easeInOut(duration: 0.20), value: selectedCategory)
+                    .animation(.easeInOut(duration: 0.15), value: searchText)
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 12)
@@ -31,6 +40,77 @@ struct HomeView: View {
             .background(AppBackgroundView())
             .navigationTitle("Home")
             .navigationBarTitleDisplayMode(.large)
+        }
+        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search meals")
+        .scrollDismissesKeyboard(.interactively)
+        .onAppear {
+            if todaysPickID == nil {
+                todaysPickID = MockMeals.all.randomElement()?.id
+            }
+        }
+    }
+
+    private var filteredMeals: [Meal] {
+        let base: [Meal]
+        if selectedCategory == "All" {
+            base = MockMeals.all
+        } else {
+            base = MockMeals.all.filter { $0.category == selectedCategory }
+        }
+
+        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else { return base }
+
+        return base.filter { $0.name.localizedCaseInsensitiveContains(query) }
+    }
+
+    private var todaysPickMeal: Meal? {
+        guard let id = todaysPickID else { return nil }
+        return MockMeals.all.first(where: { $0.id == id })
+    }
+
+    private var todaysPickSection: some View {
+        Group {
+            if let meal = todaysPickMeal {
+                NavigationLink {
+                    MealDetailView(meal: meal)
+                } label: {
+                    TodaysPickCard(meal: meal)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
+    private var categoryFilter: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 10) {
+                ForEach(categories, id: \.self) { category in
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.20)) {
+                            selectedCategory = category
+                        }
+                    } label: {
+                        Text(category)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(selectedCategory == category ? .primary : .secondary)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(.ultraThinMaterial)
+                            .clipShape(Capsule())
+                            .overlay(
+                                Capsule()
+                                    .stroke(
+                                        selectedCategory == category ? Color.primary.opacity(0.22) : Color.white.opacity(0.14),
+                                        lineWidth: 1
+                                    )
+                            )
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.vertical, 2)
+            .animation(.easeInOut(duration: 0.20), value: selectedCategory)
         }
     }
 
@@ -50,7 +130,73 @@ struct HomeView: View {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(.white.opacity(0.18), lineWidth: 1)
         )
-        .shadow(color: .black.opacity(0.08), radius: 18, x: 0, y: 10)
+        .shadow(color: .black.opacity(0.09), radius: 20, x: 0, y: 12)
+    }
+}
+
+private struct TodaysPickCard: View {
+    let meal: Meal
+
+    var body: some View {
+        HStack(spacing: 14) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(accent.opacity(0.18))
+
+                Image(systemName: meal.imageName)
+                    .font(.system(size: 34, weight: .semibold))
+                    .foregroundStyle(accent)
+            }
+            .frame(width: 84, height: 84)
+
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 8) {
+                    Text("Today’s Pick")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(.thinMaterial)
+                        .clipShape(Capsule())
+
+                    Spacer(minLength: 0)
+                }
+
+                Text(meal.name)
+                    .font(.headline)
+                    .foregroundStyle(.primary)
+
+                Text(meal.description)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+            }
+
+            Spacer(minLength: 0)
+
+            Image(systemName: "chevron.right")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.tertiary)
+        }
+        .padding(16)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .stroke(.white.opacity(0.14), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.08), radius: 20, x: 0, y: 12)
+    }
+
+    private var accent: Color {
+        switch meal.category.lowercased() {
+        case "breakfast": return .orange
+        case "lunch": return .mint
+        case "dinner": return .red
+        case "snack": return .purple
+        case "dessert": return .pink
+        default: return .secondary
+        }
     }
 }
 

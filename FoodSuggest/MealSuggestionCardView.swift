@@ -53,7 +53,7 @@ struct MealSuggestionCardView: View {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(.white.opacity(0.14), lineWidth: 1)
         )
-        .shadow(color: .black.opacity(0.07), radius: 16, x: 0, y: 10)
+        .shadow(color: .black.opacity(0.08), radius: 18, x: 0, y: 12)
     }
 
     private var icon: some View {

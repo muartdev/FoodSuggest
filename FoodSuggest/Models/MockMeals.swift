@@ -11,7 +11,7 @@ enum MockMeals {
             carbs: 48,
             fat: 18,
             description: "Grilled chicken breast served with brown rice, avocado, and seasonal vegetables. High-protein and balanced.",
-            category: "High Protein"
+            category: "Lunch"
         ),
         Meal(
             id: "creamy-mushroom-pasta",
@@ -22,7 +22,7 @@ enum MockMeals {
             carbs: 72,
             fat: 24,
             description: "Pasta with creamy mushroom sauce, garlic, and parmesan cheese. Comfort food with rich flavor.",
-            category: "Comfort"
+            category: "Dinner"
         ),
         Meal(
             id: "baked-salmon-veggies",
@@ -33,23 +33,23 @@ enum MockMeals {
             carbs: 32,
             fat: 22,
             description: "Oven-baked salmon with olive oil roasted vegetables. Rich in omega-3.",
-            category: "Healthy"
+            category: "Dinner"
         ),
         Meal(
             id: "chicken-wrap",
             name: "Chicken Wrap",
-            imageName: "wrap",
+            imageName: "tortilla",
             calories: 450,
             protein: 30,
             carbs: 40,
             fat: 16,
             description: "Whole wheat wrap with grilled chicken, yogurt sauce, and fresh greens.",
-            category: "Quick Meal"
+            category: "Lunch"
         ),
         Meal(
             id: "avocado-egg-toast",
             name: "Avocado Egg Toast",
-            imageName: "toast",
+            imageName: "takeoutbag.and.cup.and.straw",
             calories: 390,
             protein: 16,
             carbs: 34,
@@ -66,7 +66,7 @@ enum MockMeals {
             carbs: 58,
             fat: 12,
             description: "Spiced red lentil curry cooked with coconut milk and herbs.",
-            category: "Vegetarian"
+            category: "Dinner"
         ),
         Meal(
             id: "homemade-beef-burger",
@@ -77,7 +77,7 @@ enum MockMeals {
             carbs: 45,
             fat: 38,
             description: "Juicy beef patty with cheddar cheese and homemade sauce.",
-            category: "Comfort"
+            category: "Dinner"
         ),
         Meal(
             id: "falafel-plate",
@@ -88,7 +88,7 @@ enum MockMeals {
             carbs: 52,
             fat: 24,
             description: "Crispy falafel with hummus, salad, and pita bread.",
-            category: "Vegetarian"
+            category: "Lunch"
         ),
         Meal(
             id: "teriyaki-chicken-rice",
@@ -99,7 +99,7 @@ enum MockMeals {
             carbs: 62,
             fat: 16,
             description: "Sweet and savory teriyaki chicken served over steamed rice.",
-            category: "Asian"
+            category: "Dinner"
         ),
         Meal(
             id: "oatmeal-with-fruits",
@@ -111,6 +111,29 @@ enum MockMeals {
             fat: 8,
             description: "Oatmeal topped with banana, berries, and honey.",
             category: "Breakfast"
+        )
+        ,
+        Meal(
+            id: "fruit-yogurt-cup",
+            name: "Fruit Yogurt Cup",
+            imageName: "cup.and.saucer",
+            calories: 260,
+            protein: 17,
+            carbs: 28,
+            fat: 8,
+            description: "Creamy yogurt with fresh fruit and a touch of honey—light and refreshing.",
+            category: "Snack"
+        ),
+        Meal(
+            id: "dark-chocolate-mousse",
+            name: "Dark Chocolate Mousse",
+            imageName: "birthday.cake",
+            calories: 410,
+            protein: 7,
+            carbs: 36,
+            fat: 26,
+            description: "Rich, airy chocolate mousse finished with cocoa dusting.",
+            category: "Dessert"
         )
     ]
 }
