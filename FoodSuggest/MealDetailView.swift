@@ -6,6 +6,9 @@ struct MealDetailView: View {
 
     @EnvironmentObject private var favorites: FavoritesStore
     @EnvironmentObject private var intake: TodayIntakeStore
+    @EnvironmentObject private var shopping: ShoppingListStore
+
+    @State private var isShoppingAddedAlertPresented = false
 
     private var isRunningForPreviews: Bool {
         ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
@@ -32,11 +35,13 @@ struct MealDetailView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 if isRunningForPreviews {
-                    GlassShareButtonIcon()
+                    Image(systemName: "square.and.arrow.up")
+                        .imageScale(.large)
                         .accessibilityLabel("Share")
                 } else {
                     ShareLink(item: shareText) {
-                        GlassShareButtonIcon()
+                        Image(systemName: "square.and.arrow.up")
+                            .imageScale(.large)
                     }
                     .accessibilityLabel("Share")
                 }
@@ -44,6 +49,11 @@ struct MealDetailView: View {
         }
         .safeAreaInset(edge: .bottom) {
             bottomActions
+        }
+        .alert("Added to Shopping List", isPresented: $isShoppingAddedAlertPresented) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Ingredients were added to your shopping list.")
         }
     }
 
@@ -127,8 +137,29 @@ struct MealDetailView: View {
 
     private var ingredientsCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Macros")
-                .font(.headline)
+            HStack {
+                Text("Ingredients")
+                    .font(.headline)
+
+                Spacer(minLength: 0)
+
+                Button {
+                    shopping.addAll(ingredients.map { (name: $0.name, quantity: $0.quantity) })
+                    isShoppingAddedAlertPresented = true
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "cart.badge.plus")
+                            .font(.subheadline.weight(.semibold))
+                        Text("Add")
+                            .font(.subheadline.weight(.semibold))
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(.thinMaterial)
+                    .clipShape(Capsule())
+                }
+                .buttonStyle(.plain)
+            }
 
             VStack(alignment: .leading, spacing: 10) {
                 ForEach(ingredients, id: \.name) { item in
@@ -213,51 +244,22 @@ struct MealDetailView: View {
     }
 
     private var shareText: String {
+        let ingredientsText = ingredients
+            .map { "• \($0.name) — \($0.quantity)" }
+            .joined(separator: "\n")
+
         """
-        \(meal.name)
+        \(meal.name) — Meal Prep
 
-        \(meal.calories) kcal • P \(meal.protein)g • C \(meal.carbs)g • F \(meal.fat)g
+        Calories & Macros
+        \(meal.calories) kcal • Protein \(meal.protein)g • Carbs \(meal.carbs)g • Fat \(meal.fat)g
 
+        Ingredients
+        \(ingredientsText)
+
+        Notes
         \(meal.description)
         """
-    }
-}
-
-private struct GlassShareButtonIcon: View {
-    var body: some View {
-        ZStack {
-            // Outer glass circle
-            Circle()
-                .fill(.ultraThinMaterial)
-                .overlay(
-                    Circle().stroke(.white.opacity(0.22), lineWidth: 1)
-                )
-                .shadow(color: .black.opacity(0.16), radius: 16, x: 0, y: 12)
-
-            // Purple glow layer (reference-like)
-            Circle()
-                .fill(
-                    RadialGradient(
-                        colors: [
-                            Color.purple.opacity(0.85),
-                            Color.indigo.opacity(0.35),
-                            Color.clear
-                        ],
-                        center: .center,
-                        startRadius: 2,
-                        endRadius: 26
-                    )
-                )
-                .blur(radius: 0.5)
-                .opacity(0.95)
-
-            // Icon
-            Image(systemName: "square.and.arrow.up")
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(.white)
-                .shadow(color: .black.opacity(0.25), radius: 10, x: 0, y: 8)
-        }
-        .frame(width: 38, height: 38)
     }
 }
 
@@ -336,6 +338,7 @@ private struct IngredientItem {
         MealDetailView(meal: MockMeals.all[0])
             .environmentObject(FavoritesStore())
             .environmentObject(TodayIntakeStore())
+            .environmentObject(ShoppingListStore())
     }
 }
 

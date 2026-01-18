@@ -29,6 +29,12 @@ struct MainTabView: View {
                         Text("Favorites")
                     }
 
+                ShoppingListView()
+                    .tabItem {
+                        Image(systemName: "cart.fill")
+                        Text("Shopping")
+                    }
+
                 ProfileView()
                     .tabItem {
                         Image(systemName: "person.fill")
@@ -55,4 +61,5 @@ struct MainTabView: View {
     MainTabView()
         .environmentObject(FavoritesStore())
         .environmentObject(TodayIntakeStore())
+        .environmentObject(ShoppingListStore())
 }

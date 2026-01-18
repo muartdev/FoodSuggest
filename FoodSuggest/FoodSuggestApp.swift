@@ -11,12 +11,14 @@ import SwiftUI
 struct FoodSuggestApp: App {
     @StateObject private var favoritesStore = FavoritesStore()
     @StateObject private var intakeStore = TodayIntakeStore()
+    @StateObject private var shoppingStore = ShoppingListStore()
 
     var body: some Scene {
         WindowGroup {
             MainTabView()
                 .environmentObject(favoritesStore)
                 .environmentObject(intakeStore)
+                .environmentObject(shoppingStore)
         }
     }
 }
