@@ -5,7 +5,6 @@ struct HomeView: View {
     @EnvironmentObject private var intake: TodayIntakeStore
     @State private var selectedCategory: String = "All"
     @State private var todaysPickID: Meal.ID?
-    @State private var searchText: String = ""
 
     private let categories: [String] = ["All", "Breakfast", "Lunch", "Dinner", "Snack", "Dessert"]
     private let sectionSpacing: CGFloat = 10
@@ -14,8 +13,8 @@ struct HomeView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: sectionSpacing) {
-                    categoryFilter
                     todaysPickSection
+                    categoryFilter
 
                     Group {
                         if filteredMeals.isEmpty {
@@ -39,7 +38,6 @@ struct HomeView: View {
                         }
                     }
                     .animation(.easeInOut(duration: 0.20), value: selectedCategory)
-                    .animation(.easeInOut(duration: 0.15), value: searchText)
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 2)
@@ -49,8 +47,6 @@ struct HomeView: View {
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
         }
-        .searchable(text: $searchText, placement: .toolbar, prompt: "Search meals")
-        .scrollDismissesKeyboard(.interactively)
         .onAppear {
             if todaysPickID == nil {
                 todaysPickID = MockMeals.all.randomElement()?.id
@@ -59,17 +55,11 @@ struct HomeView: View {
     }
 
     private var filteredMeals: [Meal] {
-        let base: [Meal]
         if selectedCategory == "All" {
-            base = MockMeals.all
+            return MockMeals.all
         } else {
-            base = MockMeals.all.filter { $0.category == selectedCategory }
+            return MockMeals.all.filter { $0.category == selectedCategory }
         }
-
-        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !query.isEmpty else { return base }
-
-        return base.filter { $0.name.localizedCaseInsensitiveContains(query) }
     }
 
     private var emptyState: some View {
@@ -90,10 +80,6 @@ struct HomeView: View {
     }
 
     private var emptyStateMessage: String {
-        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !query.isEmpty {
-            return "Try a different name or clear the search to explore more meals."
-        }
         return "Try another category—your next favorite could be one tap away."
     }
 
@@ -216,7 +202,7 @@ private struct TodaysPickCard: View {
 }
 
 #Preview {
-    MainTabView()
+    HomeView()
         .environmentObject(FavoritesStore())
         .environmentObject(TodayIntakeStore())
 }

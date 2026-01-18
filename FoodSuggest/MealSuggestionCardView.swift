@@ -1,4 +1,24 @@
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
+
+private struct SafeSystemImage: View {
+    let name: String
+    var fallback: String = "fork.knife"
+
+    var body: some View {
+#if canImport(UIKit)
+        if UIImage(systemName: name) != nil {
+            Image(systemName: name)
+        } else {
+            Image(systemName: fallback)
+        }
+#else
+        Image(systemName: name)
+#endif
+    }
+}
 
 struct MealSuggestionCardView: View {
     let meal: Meal
@@ -84,7 +104,7 @@ struct MealSuggestionCardView: View {
         ZStack {
             Circle()
                 .fill(accent.opacity(0.20))
-            Image(systemName: meal.imageName)
+            SafeSystemImage(name: meal.imageName)
                 .font(.system(size: 18, weight: .semibold))
                 .foregroundStyle(accent)
         }
@@ -185,7 +205,7 @@ struct MealCompactCardView: View {
         ZStack {
             RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .fill(accent.opacity(0.18))
-            Image(systemName: meal.imageName)
+            SafeSystemImage(name: meal.imageName)
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundStyle(accent)
         }

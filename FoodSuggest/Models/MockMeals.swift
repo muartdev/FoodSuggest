@@ -5,7 +5,7 @@ enum MockMeals {
         Meal(
             id: "grilled-chicken-bowl",
             name: "Grilled Chicken Bowl",
-            imageName: "bowl",
+            imageName: "fork.knife.circle.fill",
             calories: 520,
             protein: 42,
             carbs: 48,
@@ -38,7 +38,7 @@ enum MockMeals {
         Meal(
             id: "chicken-wrap",
             name: "Chicken Wrap",
-            imageName: "tortilla",
+            imageName: "fork.knife.circle",
             calories: 450,
             protein: 30,
             carbs: 40,

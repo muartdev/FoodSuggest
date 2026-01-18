@@ -1,10 +1,15 @@
 import SwiftUI
+import Foundation
 
 struct MealDetailView: View {
     let meal: Meal
 
     @EnvironmentObject private var favorites: FavoritesStore
     @EnvironmentObject private var intake: TodayIntakeStore
+
+    private var isRunningForPreviews: Bool {
+        ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
+    }
 
     var body: some View {
         ScrollView {
@@ -24,6 +29,19 @@ struct MealDetailView: View {
         .background(AppBackgroundView())
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                if isRunningForPreviews {
+                    GlassShareButtonIcon()
+                        .accessibilityLabel("Share")
+                } else {
+                    ShareLink(item: shareText) {
+                        GlassShareButtonIcon()
+                    }
+                    .accessibilityLabel("Share")
+                }
+            }
+        }
         .safeAreaInset(edge: .bottom) {
             bottomActions
         }
@@ -192,6 +210,54 @@ struct MealDetailView: View {
 
     private var ingredients: [IngredientItem] {
         IngredientItem.seed(for: meal)
+    }
+
+    private var shareText: String {
+        """
+        \(meal.name)
+
+        \(meal.calories) kcal • P \(meal.protein)g • C \(meal.carbs)g • F \(meal.fat)g
+
+        \(meal.description)
+        """
+    }
+}
+
+private struct GlassShareButtonIcon: View {
+    var body: some View {
+        ZStack {
+            // Outer glass circle
+            Circle()
+                .fill(.ultraThinMaterial)
+                .overlay(
+                    Circle().stroke(.white.opacity(0.22), lineWidth: 1)
+                )
+                .shadow(color: .black.opacity(0.16), radius: 16, x: 0, y: 12)
+
+            // Purple glow layer (reference-like)
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [
+                            Color.purple.opacity(0.85),
+                            Color.indigo.opacity(0.35),
+                            Color.clear
+                        ],
+                        center: .center,
+                        startRadius: 2,
+                        endRadius: 26
+                    )
+                )
+                .blur(radius: 0.5)
+                .opacity(0.95)
+
+            // Icon
+            Image(systemName: "square.and.arrow.up")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(.white)
+                .shadow(color: .black.opacity(0.25), radius: 10, x: 0, y: 8)
+        }
+        .frame(width: 38, height: 38)
     }
 }
 
