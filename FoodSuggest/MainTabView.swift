@@ -17,12 +17,6 @@ struct MainTabView: View {
                         Text("Home")
                     }
 
-                DiscoverView()
-                    .tabItem {
-                        Image(systemName: "magnifyingglass")
-                        Text("Discover")
-                    }
-
                 FavoritesView()
                     .tabItem {
                         Image(systemName: "heart.fill")
@@ -48,8 +42,8 @@ struct MainTabView: View {
         NavigationStack {
             List {
                 NavigationLink("Home") { HomeView() }
-                NavigationLink("Discover") { DiscoverView() }
                 NavigationLink("Favorites") { FavoritesView() }
+                NavigationLink("Shopping") { ShoppingListView() }
                 NavigationLink("Profile") { ProfileView() }
             }
             .navigationTitle("Previews")

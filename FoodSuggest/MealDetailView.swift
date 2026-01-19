@@ -69,20 +69,35 @@ struct MealDetailView: View {
                 .shadow(color: .black.opacity(0.08), radius: 24, x: 0, y: 14)
 
             ZStack {
-                LinearGradient(
-                    colors: [
-                        accent.opacity(0.25),
-                        accent.opacity(0.08),
-                        Color.clear
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
+                if let asset = meal.imageAsset, UIImage(named: asset) != nil {
+                    Image(asset)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .clipped()
+                        .overlay(
+                            LinearGradient(
+                                colors: [Color.black.opacity(0.00), Color.black.opacity(0.18)],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                } else {
+                    LinearGradient(
+                        colors: [
+                            accent.opacity(0.25),
+                            accent.opacity(0.08),
+                            Color.clear
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
 
-                Image(systemName: meal.imageName)
-                    .font(.system(size: 62, weight: .semibold))
-                    .foregroundStyle(accent)
-                    .shadow(color: .black.opacity(0.10), radius: 18, x: 0, y: 10)
+                    Image(systemName: meal.imageName)
+                        .font(.system(size: 62, weight: .semibold))
+                        .foregroundStyle(accent)
+                        .shadow(color: .black.opacity(0.10), radius: 18, x: 0, y: 10)
+                }
             }
             .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
             .padding(14)
