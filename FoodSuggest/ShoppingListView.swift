@@ -14,32 +14,42 @@ struct ShoppingListView: View {
                     )
                     .listRowBackground(Color.clear)
                 } else {
-                    ForEach(shopping.items) { item in
-                        Button {
-                            shopping.toggle(item.id)
-                        } label: {
-                            HStack(spacing: 12) {
-                                Image(systemName: item.isChecked ? "checkmark.circle.fill" : "circle")
-                                    .foregroundStyle(item.isChecked ? Color.green : .secondary)
+                    ForEach(groupedSections, id: \.title) { section in
+                        Section(section.title) {
+                            ForEach(section.items) { item in
+                                HStack(spacing: 12) {
+                                    Image(systemName: item.isChecked ? "checkmark.circle.fill" : "circle")
+                                        .foregroundStyle(item.isChecked ? Color.green : .secondary)
+                                        .onTapGesture { shopping.toggle(item.id) }
 
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(item.name)
-                                        .foregroundStyle(.primary)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(item.name)
+                                            .foregroundStyle(.primary)
 
-                                    if !item.quantity.isEmpty {
-                                        Text(item.quantity)
-                                            .font(.caption)
+                                        if !item.quantity.isEmpty {
+                                            Text(item.quantity)
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                        }
+                                    }
+
+                                    Spacer(minLength: 0)
+
+                                    Button(role: .destructive) {
+                                        shopping.remove(id: item.id)
+                                    } label: {
+                                        Image(systemName: "trash")
                                             .foregroundStyle(.secondary)
                                     }
+                                    .buttonStyle(.borderless)
+                                    .accessibilityLabel("Delete item")
                                 }
-
-                                Spacer(minLength: 0)
+                                .contentShape(Rectangle())
+                                .onTapGesture { shopping.toggle(item.id) }
                             }
-                            .contentShape(Rectangle())
+                            .onDelete(perform: shopping.remove)
                         }
-                        .buttonStyle(.plain)
                     }
-                    .onDelete(perform: shopping.remove)
                 }
             }
             .scrollContentBackground(.hidden)
@@ -55,6 +65,28 @@ struct ShoppingListView: View {
                 }
             }
         }
+    }
+
+    private struct GroupedSection {
+        let title: String
+        let items: [ShoppingListStore.Item]
+    }
+
+    private var groupedSections: [GroupedSection] {
+        let grouped = Dictionary(grouping: shopping.items) { item in
+            (item.sourceMeal?.trimmingCharacters(in: .whitespacesAndNewlines)).flatMap { $0.isEmpty ? nil : $0 }
+        }
+
+        let mealTitles = grouped.keys.compactMap { $0 }.sorted()
+        var sections: [GroupedSection] = mealTitles.map { title in
+            GroupedSection(title: title, items: grouped[title]?.sorted(by: { $0.name < $1.name }) ?? [])
+        }
+
+        if let otherItems = grouped[nil], !otherItems.isEmpty {
+            sections.append(GroupedSection(title: "Other", items: otherItems.sorted(by: { $0.name < $1.name })))
+        }
+
+        return sections
     }
 }
 

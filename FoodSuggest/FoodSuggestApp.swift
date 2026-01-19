@@ -12,6 +12,7 @@ struct FoodSuggestApp: App {
     @StateObject private var favoritesStore = FavoritesStore()
     @StateObject private var intakeStore = TodayIntakeStore()
     @StateObject private var shoppingStore = ShoppingListStore()
+    @StateObject private var settingsStore = SettingsStore()
 
     var body: some Scene {
         WindowGroup {
@@ -19,6 +20,9 @@ struct FoodSuggestApp: App {
                 .environmentObject(favoritesStore)
                 .environmentObject(intakeStore)
                 .environmentObject(shoppingStore)
+                .environmentObject(settingsStore)
+                .preferredColorScheme(settingsStore.theme.colorScheme)
+                .environment(\.locale, settingsStore.language.locale ?? .current)
         }
     }
 }

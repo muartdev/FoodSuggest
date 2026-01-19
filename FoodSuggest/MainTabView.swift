@@ -62,4 +62,5 @@ struct MainTabView: View {
         .environmentObject(FavoritesStore())
         .environmentObject(TodayIntakeStore())
         .environmentObject(ShoppingListStore())
+        .environmentObject(SettingsStore())
 }

@@ -21,9 +21,10 @@ struct MealDetailView: View {
 
                 titleSection
 
-                macrosCard
-
+                aboutCard
                 ingredientsCard
+
+                macrosSummaryCard
             }
             .padding(.horizontal, 16)
             .padding(.top, 12)
@@ -113,17 +114,28 @@ struct MealDetailView: View {
         }
     }
 
-    private var macrosCard: some View {
+    private var aboutCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("Macros")
-                    .font(.headline)
-                Spacer(minLength: 0)
-            }
+            Text("About")
+                .font(.headline)
 
-            MacroProgressRow(label: "Carbs", value: meal.carbs, target: intake.targets.carbs, color: Color.blue.opacity(0.70))
-            MacroProgressRow(label: "Protein", value: meal.protein, target: intake.targets.protein, color: Color.mint.opacity(0.80))
-            MacroProgressRow(label: "Fat", value: meal.fat, target: intake.targets.fat, color: Color.orange.opacity(0.75))
+            HStack(spacing: 10) {
+                Text("Cuisine")
+                    .foregroundStyle(.secondary)
+                Spacer(minLength: 0)
+                Text(meal.cuisine)
+                    .foregroundStyle(.primary)
+            }
+            .font(.subheadline)
+
+            HStack(spacing: 10) {
+                Text("Meal type")
+                    .foregroundStyle(.secondary)
+                Spacer(minLength: 0)
+                Text(meal.category)
+                    .foregroundStyle(.primary)
+            }
+            .font(.subheadline)
         }
         .padding(16)
         .background(.ultraThinMaterial)
@@ -144,7 +156,10 @@ struct MealDetailView: View {
                 Spacer(minLength: 0)
 
                 Button {
-                    shopping.addAll(ingredients.map { (name: $0.name, quantity: $0.quantity) })
+                    shopping.addAll(
+                        ingredients.map { (name: $0.name, quantity: $0.quantity) },
+                        sourceMeal: meal.name
+                    )
                     isShoppingAddedAlertPresented = true
                 } label: {
                     HStack(spacing: 6) {
@@ -179,6 +194,27 @@ struct MealDetailView: View {
                     }
                     .font(.subheadline)
                 }
+            }
+        }
+        .padding(16)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(.white.opacity(0.14), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.06), radius: 16, x: 0, y: 10)
+    }
+
+    private var macrosSummaryCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Macros")
+                .font(.headline)
+
+            HStack(spacing: 14) {
+                MacroStat(label: "Carbs", value: "\(meal.carbs)g")
+                MacroStat(label: "Protein", value: "\(meal.protein)g")
+                MacroStat(label: "Fat", value: "\(meal.fat)g")
             }
         }
         .padding(16)
@@ -248,7 +284,7 @@ struct MealDetailView: View {
             .map { "• \($0.name) — \($0.quantity)" }
             .joined(separator: "\n")
 
-        """
+        return """
         \(meal.name) — Meal Prep
 
         Calories & Macros
@@ -263,35 +299,27 @@ struct MealDetailView: View {
     }
 }
 
-private struct MacroProgressRow: View {
+private struct MacroStat: View {
     let label: String
-    let value: Int
-    let target: Int
-    let color: Color
-
-    private var progress: Double {
-        guard target > 0 else { return 0 }
-        return min(Double(value) / Double(target), 1)
-    }
+    let value: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text(label)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.primary)
-                Spacer(minLength: 0)
-                Text("\(value)g")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-
-            ProgressView(value: progress)
-                .tint(color)
-                .background(Color.primary.opacity(0.06))
-                .clipShape(Capsule())
-                .frame(height: 8)
+        VStack(alignment: .leading, spacing: 4) {
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Text(value)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.primary)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(.thinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(.white.opacity(0.10), lineWidth: 1)
+        )
     }
 }
 

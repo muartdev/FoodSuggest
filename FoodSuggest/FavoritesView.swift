@@ -2,7 +2,6 @@ import SwiftUI
 
 struct FavoritesView: View {
     @EnvironmentObject private var favorites: FavoritesStore
-    @EnvironmentObject private var intake: TodayIntakeStore
 
     var body: some View {
         NavigationStack {
@@ -27,20 +26,11 @@ struct FavoritesView: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 80)
                 } else {
-                    LazyVStack(spacing: 14) {
-                        ForEach(savedMeals) { meal in
-                            NavigationLink {
-                                MealDetailView(meal: meal)
-                            } label: {
-                                MealSuggestionCardView(
-                                    meal: meal,
-                                    isSaved: favorites.isSaved(meal.id),
-                                    onToggleSave: { favorites.toggle(meal.id) },
-                                    onQuickAdd: { intake.add(meal: meal) }
-                                )
-                            }
-                            .buttonStyle(.plain)
-                        }
+                    LazyVStack(alignment: .leading, spacing: 18) {
+                        FavoritesSection(title: "Breakfast", meals: savedMeals.filter { $0.category == "Breakfast" })
+                        FavoritesSection(title: "Lunch", meals: savedMeals.filter { $0.category == "Lunch" })
+                        FavoritesSection(title: "Dinner", meals: savedMeals.filter { $0.category == "Dinner" })
+                        FavoritesSection(title: "Snacks", meals: savedMeals.filter { $0.category == "Snack" || $0.category == "Dessert" })
                     }
                     .padding(.horizontal, 16)
                     .padding(.top, 12)
@@ -54,9 +44,66 @@ struct FavoritesView: View {
     }
 }
 
+private struct FavoritesSection: View {
+    let title: String
+    let meals: [Meal]
+
+    var body: some View {
+        if !meals.isEmpty {
+            VStack(alignment: .leading, spacing: 10) {
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.secondary)
+
+                LazyVStack(spacing: 10) {
+                    ForEach(meals) { meal in
+                        NavigationLink {
+                            MealDetailView(meal: meal)
+                        } label: {
+                            FavoriteMealCard(meal: meal)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+        }
+    }
+}
+
+private struct FavoriteMealCard: View {
+    let meal: Meal
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 12) {
+            Text(meal.name)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.primary)
+                .lineLimit(1)
+
+            Spacer(minLength: 0)
+
+            Text("\(meal.calories) kcal")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            Image(systemName: "chevron.right")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.tertiary)
+        }
+        .padding(14)
+        .background(.thinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(.white.opacity(0.10), lineWidth: 1)
+        )
+    }
+}
+
 #Preview {
     FavoritesView()
         .environmentObject(FavoritesStore())
         .environmentObject(TodayIntakeStore())
+        .environmentObject(ShoppingListStore())
 }
 

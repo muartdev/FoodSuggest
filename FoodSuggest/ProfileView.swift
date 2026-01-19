@@ -2,19 +2,15 @@ import SwiftUI
 
 struct ProfileView: View {
     @EnvironmentObject private var intake: TodayIntakeStore
+    @AppStorage("profile_name") private var profileName: String = "Murat"
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("Today")
-                            .font(.title3.weight(.semibold))
-                        Text("Your macro progress at a glance.")
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 12)
+                    header
+                        .padding(.horizontal, 16)
+                        .padding(.top, 12)
 
                     TodaysMacrosFullCard(
                         carbs: (consumed: intake.carbsConsumed, target: intake.targets.carbs, color: Color.blue.opacity(0.75)),
@@ -22,12 +18,36 @@ struct ProfileView: View {
                         fat: (consumed: intake.fatConsumed, target: intake.targets.fat, color: Color.orange.opacity(0.80))
                     )
                     .padding(.horizontal, 16)
+
+                    MealHistoryCard(summaries: intake.dailySummaries(limitDays: 7))
+                        .padding(.horizontal, 16)
                 }
                 .padding(.bottom, 24)
             }
             .background(AppBackgroundView())
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink {
+                        SettingsView()
+                    } label: {
+                        Image(systemName: "gearshape")
+                    }
+                }
+            }
+        }
+    }
+
+    private var header: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(profileName)
+                .font(.title2.weight(.semibold))
+                .foregroundStyle(.primary)
+
+            Text("Your macro progress and meal history.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
         }
     }
 }
@@ -44,6 +64,66 @@ private struct TodaysMacrosFullCard: View {
             protein: (consumed: protein.consumed, target: protein.target, color: protein.color),
             fat: (consumed: fat.consumed, target: fat.target, color: fat.color)
         )
+    }
+}
+
+private struct MealHistoryCard: View {
+    let summaries: [TodayIntakeStore.DailySummary]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("History")
+                .font(.headline)
+
+            if summaries.isEmpty {
+                Text("No meals logged yet. Add meals from any recipe to start building your history.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            } else {
+                VStack(spacing: 10) {
+                    ForEach(summaries) { day in
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Text(dayTitle(for: day.date))
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundStyle(.primary)
+                                Spacer(minLength: 0)
+                                Text("\(day.totalCalories) kcal")
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(.secondary)
+                            }
+
+                            Text(day.meals.map(\.mealName).joined(separator: " • "))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(2)
+                        }
+                        .padding(12)
+                        .background(.thinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .stroke(.white.opacity(0.10), lineWidth: 1)
+                        )
+                    }
+                }
+            }
+        }
+        .padding(16)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .stroke(.white.opacity(0.14), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.10), radius: 22, x: 0, y: 14)
+    }
+
+    private func dayTitle(for date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = .current
+        formatter.dateFormat = "EEE, MMM d"
+        return formatter.string(from: date)
     }
 }
 
