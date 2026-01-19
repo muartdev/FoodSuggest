@@ -33,7 +33,7 @@ struct MealDetailView: View {
         .background(AppBackgroundView())
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar(.hidden, for: .navigationBar)
+        .toolbar(.hidden, for: .tabBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 if isRunningForPreviews {
