@@ -1,4 +1,7 @@
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 
 struct FavoritesView: View {
     @EnvironmentObject private var favorites: FavoritesStore
@@ -74,7 +77,9 @@ private struct FavoriteMealCard: View {
     let meal: Meal
 
     var body: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 12) {
+        HStack(spacing: 12) {
+            FavoriteMealThumbnail(assetName: meal.imageAsset, fallbackSystemName: meal.imageName)
+
             Text(meal.name)
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.primary)
@@ -97,6 +102,34 @@ private struct FavoriteMealCard: View {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .stroke(.white.opacity(0.10), lineWidth: 1)
         )
+    }
+}
+
+private struct FavoriteMealThumbnail: View {
+    let assetName: String?
+    let fallbackSystemName: String
+
+    var body: some View {
+#if canImport(UIKit)
+        if let assetName, UIImage(named: assetName) != nil {
+            Image(assetName)
+                .resizable()
+                .scaledToFill()
+                .frame(width: 44, height: 44)
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        } else {
+            Image(systemName: fallbackSystemName)
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(.primary)
+                .frame(width: 44, height: 44)
+                .background(.thinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        }
+#else
+        RoundedRectangle(cornerRadius: 10, style: .continuous)
+            .fill(.thinMaterial)
+            .frame(width: 44, height: 44)
+#endif
     }
 }
 
