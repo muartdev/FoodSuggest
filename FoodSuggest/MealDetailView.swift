@@ -33,6 +33,7 @@ struct MealDetailView: View {
         .background(AppBackgroundView())
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 if isRunningForPreviews {
@@ -254,9 +255,16 @@ struct MealDetailView: View {
                         .font(.subheadline.weight(.semibold))
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
+                .padding(.vertical, 10)
             }
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(.plain)
+            .foregroundStyle(.primary)
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(.white.opacity(0.14), lineWidth: 1)
+            )
 
             Button {
                 favorites.toggle(meal.id)
@@ -272,9 +280,8 @@ struct MealDetailView: View {
             .accessibilityLabel(favorites.isSaved(meal.id) ? "Remove from favorites" : "Add to favorites")
         }
         .padding(.horizontal, 16)
-        .padding(.top, 10)
-        .padding(.bottom, 12)
-        .background(.ultraThinMaterial)
+        .padding(.top, 8)
+        .padding(.bottom, 10)
     }
 
     private var accent: Color {
@@ -345,12 +352,173 @@ private struct IngredientItem {
 
     static func seed(for meal: Meal) -> [IngredientItem] {
         switch meal.id {
+        case "oven-baked-salmon-with-lemon":
+            return [
+                .init(symbol: "fish", name: "Salmon fillet", quantity: "180g"),
+                .init(symbol: "drop", name: "Olive oil", quantity: "1 tbsp"),
+                .init(symbol: "sparkles", name: "Lemon", quantity: "1/2"),
+                .init(symbol: "leaf", name: "Fresh herbs", quantity: "1 tbsp")
+            ]
+        case "turkish-style-chicken-saute":
+            return [
+                .init(symbol: "bird", name: "Chicken breast", quantity: "200g"),
+                .init(symbol: "leaf", name: "Bell peppers", quantity: "1 cup"),
+                .init(symbol: "drop", name: "Olive oil", quantity: "1 tbsp"),
+                .init(symbol: "circle.grid.cross", name: "Tomatoes", quantity: "1 cup")
+            ]
+        case "beef-stew-with-vegetables":
+            return [
+                .init(symbol: "fork.knife", name: "Beef chunks", quantity: "200g"),
+                .init(symbol: "leaf", name: "Carrots", quantity: "1 cup"),
+                .init(symbol: "circle.grid.cross", name: "Potatoes", quantity: "1 cup"),
+                .init(symbol: "drop", name: "Stock", quantity: "1 cup")
+            ]
+        case "baked-eggplant-with-minced-meat":
+            return [
+                .init(symbol: "leaf", name: "Eggplant", quantity: "1 large"),
+                .init(symbol: "fork.knife", name: "Minced beef", quantity: "180g"),
+                .init(symbol: "circle.grid.cross", name: "Tomato sauce", quantity: "1/2 cup"),
+                .init(symbol: "drop", name: "Olive oil", quantity: "1 tbsp")
+            ]
+        case "creamy-spinach-chicken":
+            return [
+                .init(symbol: "bird", name: "Chicken breast", quantity: "200g"),
+                .init(symbol: "leaf", name: "Spinach", quantity: "2 cups"),
+                .init(symbol: "drop", name: "Light cream", quantity: "1/3 cup"),
+                .init(symbol: "sparkles", name: "Garlic", quantity: "1 clove")
+            ]
+        case "oven-roasted-vegetables-with-feta":
+            return [
+                .init(symbol: "leaf", name: "Mixed vegetables", quantity: "2 cups"),
+                .init(symbol: "drop", name: "Olive oil", quantity: "1 tbsp"),
+                .init(symbol: "circle.grid.cross", name: "Feta cheese", quantity: "40g"),
+                .init(symbol: "sparkles", name: "Dried herbs", quantity: "1 tsp")
+            ]
+        case "homemade-chicken-schnitzel":
+            return [
+                .init(symbol: "bird", name: "Chicken breast", quantity: "200g"),
+                .init(symbol: "circle.grid.cross", name: "Breadcrumbs", quantity: "1/2 cup"),
+                .init(symbol: "drop", name: "Olive oil", quantity: "1 tbsp"),
+                .init(symbol: "sparkles", name: "Lemon", quantity: "1/2")
+            ]
+        case "zucchini-boats-with-ground-beef":
+            return [
+                .init(symbol: "leaf", name: "Zucchini", quantity: "2 medium"),
+                .init(symbol: "fork.knife", name: "Ground beef", quantity: "180g"),
+                .init(symbol: "circle.grid.cross", name: "Tomato sauce", quantity: "1/2 cup"),
+                .init(symbol: "sparkles", name: "Herbs", quantity: "1 tsp")
+            ]
+        case "rice-pilaf-with-chickpeas":
+            return [
+                .init(symbol: "takeoutbag.and.cup.and.straw", name: "Rice", quantity: "1 cup"),
+                .init(symbol: "leaf", name: "Chickpeas", quantity: "1/2 cup"),
+                .init(symbol: "drop", name: "Olive oil", quantity: "1 tbsp"),
+                .init(symbol: "sparkles", name: "Spices", quantity: "1 tsp")
+            ]
+        case "baked-pasta-with-cheese":
+            return [
+                .init(symbol: "fork.knife", name: "Pasta", quantity: "90g"),
+                .init(symbol: "circle.grid.cross", name: "Cheese blend", quantity: "1/2 cup"),
+                .init(symbol: "drop", name: "Tomato sauce", quantity: "1/2 cup"),
+                .init(symbol: "sparkles", name: "Herbs", quantity: "1 tsp")
+            ]
         case "grilled-chicken-bowl":
             return [
                 .init(symbol: "bird", name: "Chicken breast", quantity: "180g"),
                 .init(symbol: "leaf", name: "Seasonal veggies", quantity: "1 cup"),
                 .init(symbol: "takeoutbag.and.cup.and.straw", name: "Brown rice", quantity: "1 cup"),
                 .init(symbol: "avocado", name: "Avocado", quantity: "1/2")
+            ]
+        case "beef-stir-fry":
+            return [
+                .init(symbol: "fork.knife", name: "Beef strips", quantity: "200g"),
+                .init(symbol: "leaf", name: "Mixed vegetables", quantity: "2 cups"),
+                .init(symbol: "drop", name: "Soy sauce", quantity: "1 tbsp"),
+                .init(symbol: "sparkles", name: "Garlic", quantity: "1 clove")
+            ]
+        case "chicken-wrap":
+            return [
+                .init(symbol: "bird", name: "Grilled chicken", quantity: "150g"),
+                .init(symbol: "leaf", name: "Greens", quantity: "1 cup"),
+                .init(symbol: "circle.grid.cross", name: "Whole wheat wrap", quantity: "1"),
+                .init(symbol: "drop", name: "Yogurt sauce", quantity: "2 tbsp")
+            ]
+        case "falafel-plate":
+            return [
+                .init(symbol: "leaf", name: "Falafel", quantity: "4 pieces"),
+                .init(symbol: "circle.grid.cross", name: "Pita bread", quantity: "1"),
+                .init(symbol: "drop", name: "Hummus", quantity: "3 tbsp"),
+                .init(symbol: "leaf", name: "Salad mix", quantity: "1 cup")
+            ]
+        case "chicken-caesar-salad":
+            return [
+                .init(symbol: "bird", name: "Grilled chicken", quantity: "150g"),
+                .init(symbol: "leaf", name: "Romaine lettuce", quantity: "2 cups"),
+                .init(symbol: "circle.grid.cross", name: "Parmesan", quantity: "2 tbsp"),
+                .init(symbol: "drop", name: "Caesar dressing", quantity: "2 tbsp")
+            ]
+        case "tuna-salad-bowl":
+            return [
+                .init(symbol: "fish", name: "Tuna", quantity: "1 can"),
+                .init(symbol: "leaf", name: "Greens", quantity: "2 cups"),
+                .init(symbol: "circle.grid.cross", name: "Beans", quantity: "1/2 cup"),
+                .init(symbol: "drop", name: "Olive oil", quantity: "1 tbsp")
+            ]
+        case "falafel-wrap":
+            return [
+                .init(symbol: "leaf", name: "Falafel", quantity: "4 pieces"),
+                .init(symbol: "circle.grid.cross", name: "Wrap", quantity: "1"),
+                .init(symbol: "leaf", name: "Salad mix", quantity: "1 cup"),
+                .init(symbol: "drop", name: "Tahini sauce", quantity: "2 tbsp")
+            ]
+        case "salmon-rice-bowl":
+            return [
+                .init(symbol: "fish", name: "Salmon", quantity: "160g"),
+                .init(symbol: "takeoutbag.and.cup.and.straw", name: "Rice", quantity: "1 cup"),
+                .init(symbol: "leaf", name: "Cucumber", quantity: "1/2 cup"),
+                .init(symbol: "sparkles", name: "Sesame", quantity: "1 tsp")
+            ]
+        case "chicken-burrito-bowl":
+            return [
+                .init(symbol: "bird", name: "Chicken", quantity: "160g"),
+                .init(symbol: "takeoutbag.and.cup.and.straw", name: "Rice", quantity: "1 cup"),
+                .init(symbol: "circle.grid.cross", name: "Beans", quantity: "1/2 cup"),
+                .init(symbol: "leaf", name: "Salsa", quantity: "1/3 cup")
+            ]
+        case "pasta-tomato-sauce":
+            return [
+                .init(symbol: "fork.knife", name: "Pasta", quantity: "90g"),
+                .init(symbol: "drop", name: "Tomato sauce", quantity: "1/2 cup"),
+                .init(symbol: "sparkles", name: "Garlic", quantity: "1 clove"),
+                .init(symbol: "leaf", name: "Basil", quantity: "1 tbsp")
+            ]
+        case "vegetable-pasta":
+            return [
+                .init(symbol: "fork.knife", name: "Pasta", quantity: "90g"),
+                .init(symbol: "leaf", name: "Mixed vegetables", quantity: "1 1/2 cups"),
+                .init(symbol: "drop", name: "Olive oil", quantity: "1 tbsp"),
+                .init(symbol: "sparkles", name: "Herbs", quantity: "1 tsp")
+            ]
+        case "rice-chicken-plate":
+            return [
+                .init(symbol: "bird", name: "Grilled chicken", quantity: "170g"),
+                .init(symbol: "takeoutbag.and.cup.and.straw", name: "Rice", quantity: "1 cup"),
+                .init(symbol: "leaf", name: "Vegetables", quantity: "1 cup"),
+                .init(symbol: "drop", name: "Olive oil", quantity: "1 tbsp")
+            ]
+        case "mushroom-cheese-toast":
+            return [
+                .init(symbol: "circle.grid.cross", name: "Bread", quantity: "2 slices"),
+                .init(symbol: "leaf", name: "Mushrooms", quantity: "1 cup"),
+                .init(symbol: "circle.grid.cross", name: "Cheese", quantity: "1/3 cup"),
+                .init(symbol: "drop", name: "Olive oil", quantity: "1 tsp")
+            ]
+        case "meatball-plate":
+            return [
+                .init(symbol: "fork.knife", name: "Meatballs", quantity: "5 pieces"),
+                .init(symbol: "drop", name: "Tomato sauce", quantity: "1/2 cup"),
+                .init(symbol: "leaf", name: "Herbs", quantity: "1 tsp"),
+                .init(symbol: "circle.grid.cross", name: "Side greens", quantity: "1 cup")
             ]
         case "creamy-mushroom-pasta":
             return [
